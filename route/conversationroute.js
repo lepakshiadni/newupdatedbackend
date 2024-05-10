@@ -5,7 +5,8 @@ const {
     getLastMessage,
     employerConversationRequestAccept,trainerConversationRequestAccept,
     trainerdeclineConversation,employerdeclineConversation,
-    getEmployerConnectionsRequest,getTrainerConnectionsRequest,getAllRequested
+    getEmployerConnectionsRequest,getTrainerConnectionsRequest,getAllRequested,
+    employerRemoveConversation,trainerRemoverConversation
 
 } = require('../controllers/conversationctrl')
 
@@ -28,6 +29,9 @@ route.put("/trainerConversationRequestAccept",jwtverify,trainerConversationReque
 
 route.put("/employerdeclineConversation",jwtverify ,employerdeclineConversation)
 route.put("/trainerdeclineConversation",jwtverify ,trainerdeclineConversation)
+
+route.delete("/employerremoveConversation/:id",jwtverify ,employerRemoveConversation)
+route.delete("/trainerremoveConversation/:id",jwtverify ,trainerRemoverConversation)
 
 
 module.exports = route

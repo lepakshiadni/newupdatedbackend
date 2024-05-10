@@ -65,6 +65,14 @@ const trainerSchema = new mongoose.Schema(
                 type: Boolean,
                 default: false
             },
+            profileImgStatus:{
+                type: Boolean,
+                default: false
+            },
+            profileBannerStatus:{
+                type: Boolean,
+                default: false
+            },
             visbility: {
                 noOne: {
                     type: Boolean,

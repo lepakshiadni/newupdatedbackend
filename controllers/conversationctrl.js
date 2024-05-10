@@ -387,6 +387,71 @@ const trainerdeclineConversation = async (req, resp) => {
 
 }
 
+const employerRemoveConversation = async (req, resp) => {
+    const { id } = req.params;
+    const { _id } = req.user
+    console.log('apit remove hit')
+    try {
+        const removeConversation =await ConversationSchema.findOneAndDelete(
+           {
+            _id: id,
+            members: { $elemMatch: { _id: _id} }, // Corrected filter condition
+            requestStatus: "accepted",
+           }
+        )
+        if (removeConversation && req.user) {
+            const findconversation = await ConversationSchema.find({
+                members: { $elemMatch: { _id } },
+                requestStatus: "pending" // Filter by request status being "pending"
+            })
+            const conversation = findconversation?.filter(item => item?.members[0]?._id != senderId && item?.members[0]?.role === 'trainer')
+            if (conversation) {
+                resp.status(201).json({ success: true, message: 'Conversation Removed ', conversation })
+            }
+
+        }
+        else {
+            resp.status(200).json({ success: false, message: 'No conversation  Found!' })
+        }
+    }
+    catch (error) {
+        resp.status(200).json({ success: false, message: 'Server Error', error })
+    }
+
+}
+
+const trainerRemoverConversation = async (req, resp) => {
+    const { id } = req.params;
+    const { _id } = req.user
+    console.log('apit remove hit')
+    try {
+        const removeConversation = await ConversationSchema.findOneAndDelete({
+            _id: id,
+            members: { $elemMatch: { _id: _id} }, // Corrected filter condition
+            requestStatus: "accepted",
+        });
+        console.log('removeConveration',removeConversation)
+        if (removeConversation && req.user) {
+            const findconversation = await ConversationSchema.find({
+                members: { $elemMatch: { _id } },
+                requestStatus: "pending" // Filter by request status being "pending"
+            })
+            const conversation = findconversation?.filter(item => item?.members[0]?._id != senderId && item?.members[0]?.role === 'employer')
+            if (conversation) {
+                resp.status(201).json({ success: true, message: 'Conversation Removed', conversation })
+            }
+
+        }
+        else {
+            resp.status(200).json({ success: false, message: 'No Pending Request Found!' })
+        }
+    }
+    catch (error) {
+        resp.status(200).json({ success: false, message: 'Server Error', error })
+    }
+
+}
+
 
 // Update last message in a conversation
 const updateLastMessage = async (req, resp) => {
@@ -437,5 +502,6 @@ module.exports = {
     getLastMessage, trainerConversationRequestAccept,
     employerConversationRequestAccept, employerdeclineConversation,
     trainerdeclineConversation, getAllRequested,
-    getEmployerConnectionsRequest, getTrainerConnectionsRequest
+    getEmployerConnectionsRequest, getTrainerConnectionsRequest,
+    employerRemoveConversation,trainerRemoverConversation
 }

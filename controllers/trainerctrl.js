@@ -179,6 +179,7 @@ const trainerProfileImageUpdate = async (req, resp) => {
             const trainerDetails = await trainerSchema.findByIdAndUpdate({ _id }, {
                 $set: {
                     'basicInfo.profileImg': profileImgUrl,
+                    'basicInfo.profileImgStatus':true
                 }
             }, { new: true }
             )
@@ -217,7 +218,9 @@ const trainerProfileBannerUpdate = async (req, resp) => {
         if (req.user) {
             const trainerDetails = await trainerSchema.findByIdAndUpdate({ _id }, {
                 $set: {
-                    'basicInfo.profileBanner': profileBannerUrl
+                    'basicInfo.profileBanner': profileBannerUrl,
+                    'basicInfo.profileBannerStatus':true
+
                 }
             }, { new: true }
             )
