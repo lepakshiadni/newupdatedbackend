@@ -270,6 +270,7 @@ const getTrainingRequirementComments = async (req, resp) => {
 
 const deletePostTrainingComment = async (req, resp) => {
     const { postId, commentId } = req.params;
+
     // console.log(postId, commentId);
     try {
         const findTrainingPost = await postTrainingRequirementSchema.findById(postId);
@@ -278,7 +279,7 @@ const deletePostTrainingComment = async (req, resp) => {
             return resp.status(200).json({ success: false, message: "No Post Found" });
         }
 
-        const commentIndex = findTrainingPost.comments.findIndex(comment => comment._id.toString() === commentId);
+        const commentIndex = findTrainingPost.comments.findIndex(comment => comment._id.toString() === commentId  );
 
         if (commentIndex === -1) {
             return resp.status(200).json({ success: false, message: "Comment not found" });

@@ -76,7 +76,7 @@ const employerPostRequriementSchema = new mongoose.Schema({
     comments: [
         {
             commentedByUser: {
-                type: String
+                type: mongoose.Schema.Types.ObjectId,
             },
             commentedByProfile: {
                 type: String,
