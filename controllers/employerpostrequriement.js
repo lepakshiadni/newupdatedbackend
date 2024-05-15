@@ -1,5 +1,7 @@
 const postTrainingRequirementSchema = require('../models/employerpostTrainingRequirementmodel')
 const postJobRequirementSchema = require('../models/employerpostJobRequirementmodel')
+const SkillSchema = require('../models/skillmodel.js')
+
 const aws = require('aws-sdk')
 
 aws.config.update({
@@ -79,8 +81,6 @@ const postTrainingRequirement = async (req, resp) => {
 const updatePostTrainingRequirement=async(req,resp)=>{
     const {postId}=req.params
     const {_id}=req.user
-    console.log('api HIt update')
-    console.log('req.body',req.body)
     const {
         trainingName, description, typeOfTraining, participantCount,
         modeOfTraining, location, minBudget, maxBudget, experience,
@@ -413,6 +413,34 @@ const employerPostSearchHistory = async (req, res) => {
     }
 }
 
+const postTrainingSkills = async (req, resp) => {
+    try {
+        const skills = await SkillSchema.find()
+        if(skills.length> 0){
+
+            const postTrainingSkill=  skills?.map(({name})=>{
+                return {
+                    value:name,
+                    label:name
+                }
+            })
+            if(postTrainingSkill){
+                resp.status(201).json({success:true,message:'Skills Feteched',postTrainingSkill})
+            }
+    
+        }
+        else{
+            resp.status(200).json({success:false,message:'No Data Found'})
+        }
+        
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+
 module.exports = {
     postTrainingRequirement,
     getpostTrainingRequirement,
@@ -426,5 +454,6 @@ module.exports = {
     deletePostTrainingComment,
     hidePost,
     employerPostSearchHistory,
-    updatePostTrainingRequirement
+    updatePostTrainingRequirement,
+    postTrainingSkills
 }

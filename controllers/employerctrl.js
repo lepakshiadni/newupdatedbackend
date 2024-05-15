@@ -355,6 +355,7 @@ const getSkills = async (req, resp) => {
     }
 }
 
+
 const getemployerProfile = async (req, resp) => {
     const employerDetails = await req.user;
     // console.log("User details", employerDetails)
