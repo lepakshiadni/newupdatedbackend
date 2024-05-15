@@ -79,6 +79,8 @@ const postTrainingRequirement = async (req, resp) => {
 const updatePostTrainingRequirement=async(req,resp)=>{
     const {postId}=req.params
     const {_id}=req.user
+    console.log('api HIt update')
+    console.log('req.body',req.body)
     const {
         trainingName, description, typeOfTraining, participantCount,
         modeOfTraining, location, minBudget, maxBudget, experience,

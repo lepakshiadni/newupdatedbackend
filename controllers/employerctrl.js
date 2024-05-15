@@ -712,7 +712,7 @@ const getNotifications = async (req, resp) => {
             resp.status(200).json({ success: false, message: 'User Not Found' })
         }
     } catch (error) {
-        console.error('Error fetching notifications:', error);
+        // console.error('Error fetching notifications:', error);
         resp.status(200).json({ success: false, message: 'Internal server error' });
     }
 };
@@ -795,7 +795,7 @@ const updateReadNotification = async (req, resp) => {
 
     }
     catch (error) {
-        console.log(error)
+        // console.log(error)
         resp.status(200).json({ success: false, message: 'Internal Server Error' })
     }
 
