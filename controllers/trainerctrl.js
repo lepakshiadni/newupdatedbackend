@@ -548,15 +548,7 @@ const trainerAppliedTraining = async (req, resp) => {
         console.log("trainingDetails", trainingDetails);
         console.log('trainingPostId', trainingPostId);
 
-        // const ctrainerAvailableDate1 = new Date(trainingDetails.trainerAvailableDate1)
-        // const ctrainerAvailableDate2 = new Date(trainingDetails.trainerAvailableDate2)
-        // const ctrainerAvailableDate3 = new Date(trainingDetails.trainerAvailableDate3)
-
-        // const onlyDate1 = ctrainerAvailableDate1.toISOString().slice(0, 10)
-        // const onlyDate2 = ctrainerAvailableDate2.toISOString().slice(0, 10)
-        // const onlyDate3 = ctrainerAvailableDate3.toISOString().slice(0, 10)
-
-        // Check if the trainer has already applied for this training
+      // Check if the trainer has already applied for this training
         const existingApplication = await trainerAppliedTrainingSchema.findOne({
             trainerId: _id,
             'trainingDetails.trainingPostDetails._id': trainingPostId,

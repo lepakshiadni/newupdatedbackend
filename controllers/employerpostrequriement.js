@@ -88,6 +88,8 @@ const updatePostTrainingRequirement=async(req,resp)=>{
         startDate, endDate, urgentlyNeedTrainer,
     } = req.body;
 
+    console.log('req.body',req.body)
+    console.log('req.file',req.file)
     let { topics } = req.body
 
 

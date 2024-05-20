@@ -28,7 +28,7 @@ const generateopt = async (req, resp) => {
               
             console.log(otp)
             await localStorage.setItem('phoneNumber', JSON.stringify(number))
-            resp.status(200).json({ success: true, message: 'Otp sended', otp })
+            resp.status(200).json({ success: true, message: 'Otp sended'})
         }
         catch (err) {
             console.log(err)
