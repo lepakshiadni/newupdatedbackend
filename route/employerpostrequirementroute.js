@@ -37,7 +37,7 @@ route.delete('/deletePostTrainingComment/:postId/:commentId', deletePostTraining
 route.get('/getAllPostTrainingRequirement',getAllPostTrainingRequirement)
 route.post('/hidePost/:postId', hidePost)
 route.get('/searchData',employerPostSearchHistory)
-route.put('/updatePostTrainingRequirement/:postId',jwtverify,updatePostTrainingRequirement)
+route.put('/updatePostTrainingRequirement/:postId',jwtverify,upload.single('tocFile'),updatePostTrainingRequirement)
 route.get('/postTrainingSkills',postTrainingSkills)
  
 module.exports=route
