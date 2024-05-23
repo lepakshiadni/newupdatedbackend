@@ -3,7 +3,7 @@ const route = require('express').Router()
 //employer Details route 
 const {
     employerSignUp, getemployerProfile,getEmployerProfileById, employerBasicInfoUpdate,employerProfileImageUpdate,employerProfileBannerUpdate, employerSkillsUpdate, employerContactInfoUpdate, employerExperienceInfoUpdate,getSkills,
-    getAppliedTrainingEmployer, employerExperienceInfoDelete,updateProfileVisibility, addBookMarkedPost, getBookMarkedPostsByUserId, UpdatePhoneNumber,
+    getAppliedTrainingEmployer,getAcceptedTrainingEmployer, employerExperienceInfoDelete,updateProfileVisibility, addBookMarkedPost, getBookMarkedPostsByUserId, UpdatePhoneNumber,
     getNotifications,updateReadNotification,
     deleteAllNotification
 
@@ -40,6 +40,7 @@ route.put('/employerContactInfoUpdate', jwtverify, employerContactInfoUpdate)
 route.put('/employerExperienceInfoUpdate', jwtverify, employerExperienceInfoUpdate)
 route.get('/getemployerProfile', jwtverify, getemployerProfile) // to view the profile of the user who is logged in
 route.get('/getAppliedTrainingEmployer', jwtverify, getAppliedTrainingEmployer)
+route.get('/getAcceptedTrainingEmployer',jwtverify,getAcceptedTrainingEmployer)
 route.put('/updateProfileVisibility',jwtverify,updateProfileVisibility)
 route.get('/getTrainerDetailsById/:id', getTrainerDetailsById)
 route.delete('/employerExperienceInfoUpdate/:_id', jwtverify, employerExperienceInfoDelete)

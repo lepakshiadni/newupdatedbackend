@@ -6,8 +6,15 @@ const {notifications} = require('../utils/services.js')
 
 
 const getAllAppliedTraining = async (req, resp) => {
+    
+    const {_id}=req.user
+    const postedId=_id.toString()
     try {
-        const allAppliedTrainingDetails = await trainerAppliedTrainingSchema.find().sort({ createdAt: -1 });
+        const allAppliedTrainingDetails = await trainerAppliedTrainingSchema.find(
+            {
+                'trainingDetails.trainingPostDetails.postedById': postedId,
+            }
+        ).sort({ createdAt: -1 });
 
         // Filter out trainingDetails with appliedStatus set to false and applicationstatus not equal to 'Denied'
         const filteredTrainingDetails = allAppliedTrainingDetails.map((document) => {
@@ -66,8 +73,6 @@ const updateAppliedStatus = async (req, resp) => {
             const getAppliedTraining = await trainerAppliedTrainingSchema.find(
                 {
                     'trainingDetails.trainingPostDetails.postedById': postedId,
-                    // 'trainingDetails.appliedStatus': false,
-                    'trainingDetails.applicationstatus': { $ne: 'Denied' }
                 }
             )
             if (updatedTraining && getAppliedTraining) {
@@ -82,10 +87,12 @@ const updateAppliedStatus = async (req, resp) => {
 
                 const filteredTraining = getAppliedTraining.map(training => {
                     const filteredDetails = training.trainingDetails.filter(detail => {
-                        return detail.appliedStatus === false && detail.applicationstatus !== 'Denied' && detail.trainingPostDetails.postedById===postedId;
+                        return detail.appliedStatus === false &&
+                               detail.applicationstatus !== 'Denied' &&
+                               detail.trainingPostDetails.postedById === postedId;
                     });
                     return { ...training.toObject(), trainingDetails: filteredDetails };
-                });
+                }).filter(training => training.trainingDetails.length > 0); // Filter out entries with no matching training details
                 resp.status(201).json({ success: true, message: 'Applied status updated successfully', getAppliedTraining:filteredTraining });
             }
 

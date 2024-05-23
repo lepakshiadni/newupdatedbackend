@@ -179,7 +179,7 @@ const employerProfileImageUpdate = async (req, resp) => {
             const employerDetails = await employerSchema.findByIdAndUpdate({ _id }, {
                 $set: {
                     'basicInfo.profileImg': profileImgUrl,
-                    'basicInfo.profileImgStatus':true
+                    'basicInfo.profileImgStatus': true
                 }
             }, { new: true }
             )
@@ -217,7 +217,7 @@ const employerProfileBannerUpdate = async (req, resp) => {
             const employerDetails = await employerSchema.findByIdAndUpdate({ _id }, {
                 $set: {
                     'basicInfo.profileBanner': profileBannerUrl,
-                    'basicInfo.profileBannerStatus':true
+                    'basicInfo.profileBannerStatus': true
                 }
             }, { new: true }
             )
@@ -464,36 +464,27 @@ const getEmployerProfileById = async (req, resp) => {
 const getAppliedTrainingEmployer = async (req, resp) => {
     const { _id } = req.user
     const postedId = _id.toString()
-    // console.log('api hit from employer ')
+    console.log('api hit from employer ')
     try {
         if (req.user?.role === 'employer') {
             const getAppliedTraining = await trainerAppliedTrainingSchema.find(
                 {
                     'trainingDetails.trainingPostDetails.postedById': postedId,
-                    // 'trainingDetails.appliedStatus': false,
-                    // 'trainingDetails.applicationstatus': { $ne: 'Denied' }
                 }
             ).sort({ 'trainingDetails.createdAt': -1 })
-            console.log('getAppliedTraining', getAppliedTraining)
             if (!getAppliedTraining) {
                 resp.status(200).json({ success: false, message: 'Applied Training Not Found' })
             }
             else {
-                // const filteredTraining = getAppliedTraining.map(training => {
-                //     const filteredDetails = training.trainingDetails.filter(detail => {
-                //         return detail.appliedStatus === false && detail.applicationstatus !== 'Denied' && detail.trainingPostDetails.postedById===postedId;
-                //     });
-                //     return { ...training.toObject(), trainingDetails: filteredDetails };
-                // });
                 const filteredTraining = getAppliedTraining.map(training => {
                     const filteredDetails = training.trainingDetails.filter(detail => {
                         return detail.appliedStatus === false &&
-                               detail.applicationstatus !== 'Denied' &&
-                               detail.trainingPostDetails.postedById === postedId;
+                            detail.applicationstatus !== 'Denied' &&
+                            detail.trainingPostDetails.postedById === postedId;
                     });
                     return { ...training.toObject(), trainingDetails: filteredDetails };
                 }).filter(training => training.trainingDetails.length > 0); // Filter out entries with no matching training details
-                console.log('fillter training',filteredTraining) 
+                console.log('fillter training', filteredTraining)
                 resp.status(201).json({ success: true, message: 'Applied Training Fected', getAppliedTraining: filteredTraining })
             }
         }
@@ -503,9 +494,48 @@ const getAppliedTrainingEmployer = async (req, resp) => {
 
     }
     catch (error) {
-        console.log(error)
+        // console.log(error)
         resp.status(200).json({ success: false, message: 'Internal Server Error', error })
     }
+}
+
+const getAcceptedTrainingEmployer = async (req, resp) => {
+    const { _id } = req.user
+    const postedId = _id.toString()
+    console.log('api hit from employer ')
+    try {
+
+        if (req.user?.role === 'employer') {
+            const getAppliedTraining = await trainerAppliedTrainingSchema.find(
+                {
+                    'trainingDetails.trainingPostDetails.postedById': postedId,
+                }
+            ).sort({ 'trainingDetails.createdAt': -1 })
+            if (!getAppliedTraining) {
+                resp.status(200).json({ success: false, message: 'Applied Training Not Found' })
+            }
+            else {
+                const filteredTraining = getAppliedTraining.map(training => {
+                    const filteredDetails = training.trainingDetails.filter(detail => {
+                        return detail.appliedStatus === true &&
+                            detail.applicationstatus === 'Accepted' &&
+                            detail.trainingPostDetails.postedById === postedId;
+                    });
+                    return { ...training.toObject(), trainingDetails: filteredDetails };
+                }).filter(training => training.trainingDetails.length > 0); // Filter out entries with no matching training details
+                console.log('fillter training', filteredTraining)
+                resp.status(201).json({ success: true, message: 'Applied Training Fected', getAppliedTraining: filteredTraining })
+            }
+
+        }
+
+
+    }
+    catch (error) {
+        resp.status(200).json({ success: false, message: 'Internal Server Error', error })
+    }
+
+
 }
 
 
@@ -664,7 +694,7 @@ const UpdatePhoneNumber = async (req, resp) => {
 
 const getNotifications = async (req, resp) => {
     const { userId } = req.params;
-    console.log('userId',userId)
+    console.log('userId', userId)
 
     try {
         if (userId?.length > 0) {
@@ -855,6 +885,7 @@ module.exports = {
     employerExperienceInfoDelete,
     getSkills,
     getAppliedTrainingEmployer,
+    getAcceptedTrainingEmployer,
     updateProfileVisibility,
     addBookMarkedPost,
     getBookMarkedPostsByUserId,
