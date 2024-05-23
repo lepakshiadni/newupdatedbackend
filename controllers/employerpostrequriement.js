@@ -26,7 +26,7 @@ const postTrainingRequirement = async (req, resp) => {
         let { topics } = req.body
 
 
-        if (typeof topics === 'string') {
+        if (typeof topics === 'string') { 
             topics = JSON.parse(topics)
         }
         console.log('req.body',req.file)
@@ -66,11 +66,7 @@ const postTrainingRequirement = async (req, resp) => {
         await trainingDetails.save();
 
         // Respond with success message
-        resp.status(200).json({
-            success: true,
-            message: 'TrainingPostCreatedSuccessfully',
-            trainingDetails
-        });
+        resp.status(200).json({success: true,message: 'TrainingPostCreatedSuccessfully',trainingDetails});
     } catch (err) {
         console.log(err);
         resp.status(500).json({ success: false, message: 'Server Error' });

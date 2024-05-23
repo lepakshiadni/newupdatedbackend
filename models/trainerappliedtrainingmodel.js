@@ -16,21 +16,7 @@ const trainerAppliedTraining = new mongoose.Schema({
     trainerDesignation: {
         type: String
     },
-    trainerExpertIn:{
-        type:String
-    },
-    trainerExperience:{
-        type:String
-    },
-    trainerAge:{
-        type:Number
-    },
-    trainerTraining:{
-        type:Number
-    },
-    trainerSince:{
-        type:String
-    },
+
     trainingDetails: [
         {
             trainingPostDetails: {
@@ -70,8 +56,6 @@ const trainerAppliedTraining = new mongoose.Schema({
                 feedBack: {
                     type: String
                 }
-             
-
             },
             appliedStatus: {
                 type: Boolean,

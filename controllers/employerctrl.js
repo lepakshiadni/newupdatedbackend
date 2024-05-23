@@ -470,22 +470,30 @@ const getAppliedTrainingEmployer = async (req, resp) => {
             const getAppliedTraining = await trainerAppliedTrainingSchema.find(
                 {
                     'trainingDetails.trainingPostDetails.postedById': postedId,
-                    'trainingDetails.appliedStatus': false,
-                    'trainingDetails.applicationstatus': { $ne: 'Denied' }
+                    // 'trainingDetails.appliedStatus': false,
+                    // 'trainingDetails.applicationstatus': { $ne: 'Denied' }
                 }
             ).sort({ 'trainingDetails.createdAt': -1 })
-
+            console.log('getAppliedTraining', getAppliedTraining)
             if (!getAppliedTraining) {
                 resp.status(200).json({ success: false, message: 'Applied Training Not Found' })
             }
             else {
+                // const filteredTraining = getAppliedTraining.map(training => {
+                //     const filteredDetails = training.trainingDetails.filter(detail => {
+                //         return detail.appliedStatus === false && detail.applicationstatus !== 'Denied' && detail.trainingPostDetails.postedById===postedId;
+                //     });
+                //     return { ...training.toObject(), trainingDetails: filteredDetails };
+                // });
                 const filteredTraining = getAppliedTraining.map(training => {
                     const filteredDetails = training.trainingDetails.filter(detail => {
-                        return detail.appliedStatus === false && detail.applicationstatus !== 'Denied';
+                        return detail.appliedStatus === false &&
+                               detail.applicationstatus !== 'Denied' &&
+                               detail.trainingPostDetails.postedById === postedId;
                     });
                     return { ...training.toObject(), trainingDetails: filteredDetails };
-                });
-                // console.log('fillter training',filteredTraining)
+                }).filter(training => training.trainingDetails.length > 0); // Filter out entries with no matching training details
+                console.log('fillter training',filteredTraining)
                 resp.status(201).json({ success: true, message: 'Applied Training Fected', getAppliedTraining: filteredTraining })
             }
         }

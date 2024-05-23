@@ -41,9 +41,7 @@ const getAllAppliedTraining = async (req, resp) => {
 
 
 const updateAppliedStatus = async (req, resp) => {
-    const { trainerId, trainingDetailsId, employerId, status } = req.body; // Assuming you're passing trainerId and trainingDetailsId in the request body
-    // console.log(req.body)
-    // console.log(trainerId,trainingDetailsId,status)
+    const { trainerId, trainingDetailsId, status } = req.body; // Assuming you're passing trainerId and trainingDetailsId in the request body
     const {_id}=req.user
     const postedId = _id.toString()
     try {
@@ -55,8 +53,8 @@ const updateAppliedStatus = async (req, resp) => {
             },
             {
                 $set: {
-                    'trainingDetails.$.appliedStatus': status === 'Denied' ? true : null,
-                    'trainingDetails.$.applicationstatus': status === 'Denied' ? 'Accepted' : null
+                    'trainingDetails.$.appliedStatus': status === 'Denied' ? false : true,
+                    'trainingDetails.$.applicationstatus': status === 'Denied' ? 'Denied' : 'Accepted'
                 }
             },
             { new: true }
@@ -68,7 +66,7 @@ const updateAppliedStatus = async (req, resp) => {
             const getAppliedTraining = await trainerAppliedTrainingSchema.find(
                 {
                     'trainingDetails.trainingPostDetails.postedById': postedId,
-                    'trainingDetails.appliedStatus': false,
+                    // 'trainingDetails.appliedStatus': false,
                     'trainingDetails.applicationstatus': { $ne: 'Denied' }
                 }
             )
@@ -84,7 +82,7 @@ const updateAppliedStatus = async (req, resp) => {
 
                 const filteredTraining = getAppliedTraining.map(training => {
                     const filteredDetails = training.trainingDetails.filter(detail => {
-                        return detail.appliedStatus === false && detail.applicationstatus !== 'Denied';
+                        return detail.appliedStatus === false && detail.applicationstatus !== 'Denied' && detail.trainingPostDetails.postedById===postedId;
                     });
                     return { ...training.toObject(), trainingDetails: filteredDetails };
                 });

@@ -562,7 +562,7 @@ const trainerAppliedTraining = async (req, resp) => {
             const findApplication = await trainerAppliedTrainingSchema.findOne({ "trainerId": _id });
             // console.log("findApplication", findApplication)
             if (findApplication) {
-                findApplication.trainingDetails.push(trainingDetails);
+                findApplication.trainingDetails.unshift(trainingDetails);
                 await findApplication.save();
                 // console.log(findApplication)
                 return resp.status(201).json({ success: true, message: 'Application Applied' })
@@ -576,9 +576,6 @@ const trainerAppliedTraining = async (req, resp) => {
                     trainingDetails: [
                         {
                             trainingPostDetails: trainingDetails?.trainingPostDetails,
-                            // trainerAvailableDate1: onlyDate1,
-                            // trainerAvailableDate2: onlyDate2,
-                            // trainerAvailableDate3: onlyDate3,
                         }
                     ]
                 });
