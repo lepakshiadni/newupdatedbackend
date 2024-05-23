@@ -493,7 +493,7 @@ const getAppliedTrainingEmployer = async (req, resp) => {
                     });
                     return { ...training.toObject(), trainingDetails: filteredDetails };
                 }).filter(training => training.trainingDetails.length > 0); // Filter out entries with no matching training details
-                console.log('fillter training',filteredTraining)
+                console.log('fillter training',filteredTraining) 
                 resp.status(201).json({ success: true, message: 'Applied Training Fected', getAppliedTraining: filteredTraining })
             }
         }
