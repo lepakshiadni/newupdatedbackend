@@ -29,10 +29,10 @@ app.use(express.urlencoded({
 }))
 app.use(cookieParser())
 app.use(cors({
-    origin:"*",
-    credentials: true 
-}))
-
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization']
+}));
 
 dbconnect()
 
