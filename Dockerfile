@@ -15,7 +15,7 @@ RUN npm install
 
 # Copy the NGINX configuration file
  COPY config/nginx.conf /etc/nginx/nginx.conf
-
+ COPY config/default.conf /etc/nginx/http.d/default.conf
 # Copy your app files
 COPY . .
 
