@@ -13,11 +13,21 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Build the application (if there's a build step)
-RUN npm run build
-
 # Use the official Nginx image as the base for the production stage
 FROM nginx:alpine
+
+# Copy the built application from the build stage
+COPY --from=build /app /usr/share/nginx/html
+
+# Copy the Nginx configuration file from the config directory
+COPY config/nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 4000
+EXPOSE 4000
+
+# Start Nginx when the container launches
+CMD ["nginx", "-g", "daemon off;"]
+
 
 # Copy the built application from the build stage
 COPY --from=build /app/build /usr/share/nginx/html
