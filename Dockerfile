@@ -21,7 +21,7 @@ COPY . .
 
 # Make port 8080 available to the world outside this container
 EXPOSE 4000
-
+EXPOSE 80
 # Start NGINX and run the app when the container launches
 CMD ["nginx", "-g", "daemon off;"]
 
