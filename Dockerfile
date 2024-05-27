@@ -2,7 +2,7 @@
 FROM node:alpine3.18
 
 # Install NGINX
-RUN apk --no-cache add nginx
+RUN apk --no-cache add nginx supervisor
 
 # Set the working directory to /app
 WORKDIR /app
@@ -19,10 +19,12 @@ RUN npm install
 # Copy your app files
 COPY . .
 
+COPY config/supervisord.conf /etc/supervisord.conf
+
 # Make port 8080 available to the world outside this container
 EXPOSE 80
 # Start NGINX and run the app when the container launches
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["supervisord", "-c", "/etc/supervisord.conf"]
 
 
 
