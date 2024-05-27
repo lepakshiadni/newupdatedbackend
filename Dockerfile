@@ -13,6 +13,8 @@ COPY package*.json /app
 RUN npm install
 
 COPY . .
+FROM nginx:latest 
+COPY default.conf /etc/nginx/conf.d/default.conf
 
 # Make port 8080 available to the world outside this container
 EXPOSE 4000
