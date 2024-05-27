@@ -14,7 +14,7 @@ COPY package*.json /app
 RUN npm install
 
 # Copy the NGINX configuration file
-# COPY config/nginx.conf /etc/nginx/nginx.conf
+ COPY config/nginx.conf /etc/nginx/nginx.conf
 
 # Copy your app files
 COPY . .
