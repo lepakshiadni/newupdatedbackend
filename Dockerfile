@@ -1,5 +1,5 @@
-# Use the official Node.js 14 image as the build stage
-FROM node:14 AS build
+# Use the official Node.js image as the base image
+FROM node:14-alpine
 
 # Set the working directory to /app
 WORKDIR /app
@@ -7,39 +7,30 @@ WORKDIR /app
 # Copy the package.json and package-lock.json
 COPY package*.json ./
 
-# Install any needed packages specified in package.json
+# Install the dependencies
 RUN npm install
 
 # Copy the rest of the application code
 COPY . .
 
-# Use the official Nginx image as the base for the production stage
+# Expose the port the Node.js app runs on
+EXPOSE 4000
+
+# Use the official Nginx image for the final stage
 FROM nginx:alpine
 
-# Copy the built application from the build stage
-COPY --from=build /app /usr/share/nginx/html
-
-# Copy the Nginx configuration file from the config directory
+# Copy the Nginx configuration file
 COPY config/nginx.conf /etc/nginx/nginx.conf
 
-# Expose port 4000
-EXPOSE 4000
+# Copy the Node.js app from the previous stage
+COPY --from=0 /app /app
 
-# Start Nginx when the container launches
+# Expose port 80 for Nginx
+EXPOSE 80
+
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
 
-
-# Copy the built application from the build stage
-COPY --from=build /app/build /usr/share/nginx/html
-
-# Copy the Nginx configuration file from the config directory
-COPY config/nginx.conf /etc/nginx/nginx.conf
-
-# Expose port 4000
-EXPOSE 4000
-
-# Start Nginx when the container launches
-CMD ["nginx", "-g", "daemon off;"]
 
 
 # # Use the official Node.js 14 image as the base image.
