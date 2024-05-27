@@ -23,6 +23,8 @@ COPY config/supervisord.conf /etc/supervisord.conf
 
 # Make port 8080 available to the world outside this container
 EXPOSE 80
+EXPOSE 4000
+
 # Start NGINX and run the app when the container launches
 CMD ["supervisord", "-c", "/etc/supervisord.conf"]
 
