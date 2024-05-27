@@ -3,6 +3,14 @@
 FROM node:alpine3.18
 
 
+# Install Nginx
+RUN apt-get update && \
+    apt-get install -y nginx && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy custom Nginx configuration file to the container
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Set the working directory to /app
 WORKDIR /app
 
@@ -11,6 +19,7 @@ COPY package*.json /app
 
 # Install any needed packages specified in package.json
 RUN npm install
+
 
 COPY . .
 
