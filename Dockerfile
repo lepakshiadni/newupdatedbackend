@@ -2,15 +2,6 @@
 # Use the official Node.js 14 image as the base image.
 FROM node:alpine3.18
 
-
-# Install Nginx
-RUN apt-get update && \
-    apt-get install -y nginx && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy custom Nginx configuration file to the container
-COPY default.conf /etc/nginx/conf.d/default.conf
-
 # Set the working directory to /app
 WORKDIR /app
 
