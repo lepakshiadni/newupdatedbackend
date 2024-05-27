@@ -44,8 +44,8 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
       - name: Run Docker Container
-        run: sudo docker run -d -p 4000:4000 --restart=always --name nodejs_backend-container --env-file .env lepakshia/updated-nodejs-backend
-# name: Deploy Node Application
+        run: sudo docker run -d -p 4000:80 --restart=always --name nodejs_backend-container --env-file .env lepakshia/updated-nodejs-backend
+
 
 # on:
 #   push:
