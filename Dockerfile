@@ -1,5 +1,5 @@
 # Use the official Node.js image as the base image
-FROM node:14-alpine
+FROM node:alpine3.18
 
 # Set the working directory to /app
 WORKDIR /app
@@ -14,16 +14,10 @@ RUN npm install
 COPY . .
 
 # Expose the port the Node.js app runs on
-EXPOSE 4000
+
 
 # Use the official Nginx image for the final stage
-FROM nginx:alpine
-
-# Copy the Nginx configuration file
-COPY config/nginx.conf /etc/nginx/nginx.conf
-
-# Copy the Node.js app from the previous stage
-COPY --from=0 /app /app
+FROM nginx:1.23-alpine
 
 # Expose port 80 for Nginx
 EXPOSE 4000
