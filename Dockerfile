@@ -22,15 +22,14 @@ FROM nginx:alpine
 # Copy the built application from the build stage
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Copy the Nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy the Nginx configuration file from the config directory
+COPY config/nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 4000
 EXPOSE 4000
 
 # Start Nginx when the container launches
 CMD ["nginx", "-g", "daemon off;"]
-
 
 
 # # Use the official Node.js 14 image as the base image.
