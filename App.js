@@ -33,7 +33,6 @@ app.use(cors({
     credentials: true 
 }))
 
-
 dbconnect()
 
 //All user routes
