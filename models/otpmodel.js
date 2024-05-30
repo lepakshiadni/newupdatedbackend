@@ -17,7 +17,7 @@ const otpSchema= new mongoose.Schema({
 },
     {
         timestamps: true  // Saves createdAt and updatedAt as dates. Creates them in UTC.
-    }
+    } 
 
 )
 otpSchema.pre("save",async function  (next){
