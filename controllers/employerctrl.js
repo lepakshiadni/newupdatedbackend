@@ -137,6 +137,8 @@ const employerBasicInfoUpdate = async (req, resp) => {
                     'basicInfo.profileImg': profileImgUrl,
                     'basicInfo.profileBanner': profileBannerUrl,
                     'basicInfo.status': req.body.status,
+                    'basicInfo.profileImgStatus': true,
+                    'basicInfo.profileBannerStatus': true,
                     fullName: `${req.body.firstName} ${req.body.lastName}`
 
                 }

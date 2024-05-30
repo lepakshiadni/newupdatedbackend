@@ -15,23 +15,30 @@ const generateopt = async (req, resp) => {
     console.log(number);
     if (number) {
         try {
-            let user = await otpSchema.findOne({ phoneNumber: number })
-            if (!user) {
-                user = new otpSchema({
+            let user = await otpSchema.findOne(
+                {
                     phoneNumber: number
-                })
+                }
+            )
+            if (!user) {
+                user = new otpSchema(
+                    {
+                        phoneNumber: number
+                    }
+                )
             }
             const otp = generateOtp()
             user.Otp = otp
             await user.save();
-            await sendOTP(number,otp) //otp service
-              
-            console.log(otp)
-            await localStorage.setItem('phoneNumber', JSON.stringify(number))
-            resp.status(200).json({ success: true, message: 'Otp sended'})
+            // await sendOTP(number,otp) //otp service
+
+            console.log(otp) 
+            localStorage.setItem('phoneNumber', JSON.stringify(number))
+            resp.status(200).json({ success: true, message: 'Otp sended' })
         }
         catch (err) {
             console.log(err)
+            resp.status(500).json({success:false, message:'Internal Server Error',err})
         }
     }
 
@@ -40,7 +47,7 @@ const generateopt = async (req, resp) => {
 //Verify opt api 
 
 // const verifyOtp = async (req, resp) => {
-    
+
 //     const { otp, phoneNumber, } = req.body
 
 //     //finding the users in the db using the phoneNumber and validating the opt
@@ -64,7 +71,7 @@ const generateopt = async (req, resp) => {
 //     if (existEmployer && findUser) {
 
 //         const valid = await compareOtp(otp, phoneNumber) //validateting the opt form the user 
-        
+
 //         if (valid) {
 //             if (existEmployer?.role === 'employer') {
 
@@ -102,7 +109,7 @@ const verifyOtp = async (req, resp) => {
             const valid = await compareOtp(otp, phoneNumber); // validating  the otp from the otp Schema 
             if (valid) {
                 if (existTrainer.role === 'trainer') {
-                    const token = await generateToken(existTrainer._id); // generating the token for the user according to the role 
+                    const token = generateToken(existTrainer._id); // generating the token for the user according to the role 
                     return resp.status(200).json({ success: true, message: 'verifiedExitingTrainer', existTrainer, token });
                 }
             } else {
@@ -114,7 +121,7 @@ const verifyOtp = async (req, resp) => {
             const valid = await compareOtp(otp, phoneNumber);// validating  the otp from the otp Schema 
             if (valid) {
                 if (existEmployer.role === 'employer') {
-                    const token = await generateToken(existEmployer._id);// generating the token for the user according to the role 
+                    const token = generateToken(existEmployer._id);// generating the token for the user according to the role 
                     return resp.status(200).json({ success: true, message: 'verifiedExitingEmployer', existEmployer, token });
                 }
             } else {
@@ -132,7 +139,7 @@ const verifyOtp = async (req, resp) => {
         // Handle the case where no conditions are met
         return resp.status(404).json({ success: false, message: 'Invalid OTP' });
     } catch (error) {
-        console.error(error);
+        // console.error(error);
         return resp.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
@@ -227,4 +234,4 @@ const getuserId = async (req, resp) => {
 
 
 
-module.exports = { generateopt, verifyOtp,  getuser, getuserId, getAlluser, updateProfile }
+module.exports = { generateopt, verifyOtp, getuser, getuserId, getAlluser, updateProfile }

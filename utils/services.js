@@ -7,6 +7,7 @@ const Axios = require('axios')
 
 // Initialize the fast2Sms client
 const authToken = process.env.OTP_TOKEN;
+
 const sendOTP = async (phoneNumber, otp) => {
     const smsData = {
         "route": "otp",
@@ -28,19 +29,23 @@ const sendOTP = async (phoneNumber, otp) => {
 }
 
 const generateOtp = () => {
-    //generate otp code 4 digit
+    //generate otp code 4 digit 
     const otp = Math.floor(1000 + Math.random() * 9000)
     return otp
 }
 
 const compareOtp = async (otp, number) => {
     console.log(otp, number)
-    const finduser = await otpSchema.findOne({ phoneNumber: number })
+    const finduser = await otpSchema.findOne(
+        {
+            phoneNumber: number
+        }
+    )
     if (!finduser) {
         console.log('user Not fount')
     }
     else {
-        const validotp = await bcrpt.compare(otp, finduser?.Otp)
+        const validotp = bcrpt.compare(otp, finduser?.Otp)
         return validotp
     }
 }
@@ -58,7 +63,7 @@ const decodedpassword = async (email, password) => {
 }
 
 const notifications = async (userId, notifications) => {
-    console.log('nofitificaiton',notifications)
+    console.log('nofitificaiton', notifications)
     try {
         const findUser = await notificationSchema.findOne({ userId })
         if (findUser) {

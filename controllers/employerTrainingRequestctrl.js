@@ -1,6 +1,6 @@
 const trainerAppliedTrainingSchema = require('../models/trainerappliedtrainingmodel.js');
 const employerTrainingRequestSchema = require('../models/employerTrainingRequestmodel')
-const {notifications} = require('../utils/services.js')
+const { notifications } = require('../utils/services.js')
 
 
 const employerTrainingRequest = async (req, resp) => {
@@ -30,10 +30,10 @@ const employerTrainingRequest = async (req, resp) => {
             return resp.status(200).json({ success: false, message: 'Trainer already Applied Accept the Training' })
         }
         else {
-            const findRequest = await employerTrainingRequestSchema.findOne({ trainerId: trainer?._id,employerId: _id, });
+            const findRequest = await employerTrainingRequestSchema.findOne({ trainerId: trainer?._id, employerId: _id, });
             if (findRequest) {
                 // console.log(trainingDetails)
-                findRequest.trainingDetails.push(trainingDetails);
+                findRequest.trainingDetails.unshift(trainingDetails);
                 await findRequest.save()
                 // console.log(findRequest)
                 resp.status(201).json({ success: true, message: 'Request Added Successfull' })
@@ -71,9 +71,9 @@ const getEmployerApplicationRequest = async (req, resp) => {
     const { _id } = req.user
 
     try {
-const findAppliedTraining = await employerTrainingRequestSchema.find({ employerId: _id })
-// .populate('trainingDetails.trainingPostDetails')
-        
+        const findAppliedTraining = await employerTrainingRequestSchema.find({ employerId: _id })
+        // .populate('trainingDetails.trainingPostDetails')
+
         // const trainingPostData = findAppliedTraining.trainingDetails.map(({ trainingPostDetails, appliedStatus, applicationstatus, _id, trainingResources, feedBackDetails }) => {
         //     // Destructure the `tocFile` key from `trainingPostDetails`
         //     // const { tocFile, ...updatedTrainingPostDetails } = trainingPostDetails;
@@ -129,25 +129,28 @@ const getAllRequestTrainer = async (req, resp) => {
 
 // after this update add the training to the trainer Schema applied
 
-function addTrainingData (trainingDetails) {
-    // return new Promise((resolve, reject) => {
-    //     TrainerSchema.findOne({_id : trainingDetails._trainerId},  
-    //         {$push: {"applied": trainingDetails}}, {new: true})
-    //         .then(data=>{
-    //             resolve(data);
-    //         }).catch(err => {reject("Error in adding data")});
-    // })
+const addTrainingData = async (trainingDetails, _id,status) => {
 
+    if (status !== 'Denied') {
+        const updatedDetails = {
+            trainingPostDetails: trainingDetails,
+            appliedStatus: status === 'Denied' ? false : true,
+            applicationstatus: status === 'Denied' ? 'Denied' : 'Accepted'
+        };
 
-
+        const findAppliedTraining = await trainerAppliedTrainingSchema.findOneAndUpdate(
+            { trainerId: _id },
+            { $push: { trainingDetails: updatedDetails } },
+            { new: true, upsert: true }
+        );
+        console.log('findAppliedTraining', findAppliedTraining);
+        return findAppliedTraining
+    }
 }
 
 const updateRequestStatus = async (req, resp) => {
-    const { employerId, trainingDetailsId,trainingDetails, status } = req.body;
-    const {_id}=req.user
-
-    
-
+    const { employerId, trainingDetailsId, trainingDetails, status } = req.body;
+    const { _id } = req.user
     try {
         const updatedTraining = await employerTrainingRequestSchema.findOneAndUpdate(
             {
@@ -162,22 +165,25 @@ const updateRequestStatus = async (req, resp) => {
             },
             { new: true }
         );
-            console.log(updatedTraining,"updated Training");
+        // console.log(updatedTraining, "updated Training");
         await updatedTraining.save()
         // console.log(updatedTraining);
 
 
         if (updatedTraining) {
-            const getAllRequestTraining=await employerTrainingRequestSchema.find({ employerId: _id })
-            if(getAllRequestTraining){
-                // const notifierDetails = updatedTraining.trainingDetails.find(detail => detail.trainingPostDetails.postedById === postedId);
+            if(status !=='Denied'){
+                const addingTrainingData = await addTrainingData(trainingDetails, _id,status)
+                console.log('addingTrainingData', addingTrainingData)
+            }
+            const getAllRequestTraining = await employerTrainingRequestSchema.find({ employerId: _id })
+            if (getAllRequestTraining) {
                 let notification = {
                     notifierId: _id,
                     notifierName: req.user?.fullName,
                     notifierImage: req.user?.basicInfo?.profileImg,
-                    notificationMessage: 'Training Request Accepted'
+                    notificationMessage: status === 'Denied' ? 'Training Request Denied' : 'Training Request Accepted',
                 };
-                await notifications(employerId,notification)
+                await notifications(employerId, notification)
                 resp.status(201).json({ success: true, message: 'Applied status updated successfully', getAllRequestTraining });
             }
         } else {

@@ -124,6 +124,8 @@ const trainerBasicInfoUpdate = async (req, resp) => {
                         'basicInfo.profileImg': profileImgUrl,
                         'basicInfo.profileBanner': profileBannerUrl,
                         'basicInfo.status': req.body.status,
+                        'basicInfo.profileImgStatus': true,
+                        'basicInfo.profileBannerStatus': true,
                         fullName: `${req.body.firstName} ${req.body.lastName}`
                     }
                 }, { new: true }
@@ -179,7 +181,7 @@ const trainerProfileImageUpdate = async (req, resp) => {
             const trainerDetails = await trainerSchema.findByIdAndUpdate({ _id }, {
                 $set: {
                     'basicInfo.profileImg': profileImgUrl,
-                    'basicInfo.profileImgStatus':true
+                    'basicInfo.profileImgStatus': true
                 }
             }, { new: true }
             )
@@ -219,7 +221,7 @@ const trainerProfileBannerUpdate = async (req, resp) => {
             const trainerDetails = await trainerSchema.findByIdAndUpdate({ _id }, {
                 $set: {
                     'basicInfo.profileBanner': profileBannerUrl,
-                    'basicInfo.profileBannerStatus':true
+                    'basicInfo.profileBannerStatus': true
 
                 }
             }, { new: true }
@@ -548,7 +550,7 @@ const trainerAppliedTraining = async (req, resp) => {
         console.log("trainingDetails", trainingDetails);
         console.log('trainingPostId', trainingPostId);
 
-      // Check if the trainer has already applied for this training
+        // Check if the trainer has already applied for this training
         const existingApplication = await trainerAppliedTrainingSchema.findOne({
             trainerId: _id,
             'trainingDetails.trainingPostDetails._id': trainingPostId,
@@ -746,11 +748,71 @@ const getTrainerDetailsById = async (req, resp) => {
     const { id } = req.params
     try {
         const trainerDetails = await trainerSchema.findOne({ _id: id })
+
         if (!trainerDetails) {
             resp.status(200).json({ success: false, message: "No User Found" })
         }
         else {
-            resp.status(201).json({ success: true, message: 'Trainer Details Fetched', trainerDetails })
+            const findFeedBack = await trainerFeedBackSchema.aggregate([
+                {
+                    "$match": {
+                        "trainerId": new mongoose.Types.ObjectId(id)
+                    }
+                },
+                {
+                    $unwind: '$feedBackDetails'
+                },
+                {
+                    $lookup: {
+                        from: 'employers',
+                        localField: 'feedBackDetails.reviewedById',
+                        foreignField: "_id",
+                        as: "employerDetails"
+                    }
+                },
+                // {
+                //     $set: {
+                //         'employerDetails': { $first: '$employerDetails' }
+                //     }
+                // },
+                {
+                    $set: {
+                        'feedBackDetails.reviewedByName': { $arrayElemAt: ['$employerDetails.fullName', 0] },
+                        'feedBackDetails.reviewedByDesignation': { $arrayElemAt: ['$employerDetails.designation', 0] },
+                        'feedBackDetails.reviewedByImg': { $arrayElemAt: ['$employerDetails.basicInfo.profileImg', 0] }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$_id',
+                        trainerId: { $first: '$trainerId' },
+                        feedBackDetails: { $push: '$feedBackDetails' },
+                        averageRating: { $avg: '$feedBackDetails.rating' },
+                    }
+                },
+                // {
+                //     "$project": {
+                //         '_id': 1,
+                //         'rating': 1,
+                //         'feedBack': 1,
+                //         'feedBackDetails': 1,
+                //         "reviewedByName": 1,
+                //         "reviewedByDesignation": 1,
+                //         "reviewedByImg": 1,
+                //         // 'trainingDetails': 1,
+                //     }
+                // },
+                {
+                    $project: {
+                        _id: 1,
+                        trainerId: 1,
+                        feedBackDetails: 1,
+                        averageRating: 1
+                    }
+
+                }
+            ])
+            resp.status(201).json({ success: true, message: 'Trainer Details Fetched', trainerDetails, findFeedBack })
         }
 
     }
@@ -827,6 +889,9 @@ const getFeedBack = async (req, resp) => {
                 }
             },
             {
+                $unwind: '$feedBackDetails'
+            },
+            {
                 $lookup: {
                     from: 'employers',
                     localField: 'feedBackDetails.reviewedById',
@@ -834,34 +899,51 @@ const getFeedBack = async (req, resp) => {
                     as: "employerDetails"
                 }
             },
+            // {
+            //     $set: {
+            //         'employerDetails': { $first: '$employerDetails' }
+            //     }
+            // },
             {
                 $set: {
-                    'employerDetails': { $first: '$employerDetails' }
+                    'feedBackDetails.reviewedByName': { $arrayElemAt: ['$employerDetails.fullName', 0] },
+                    'feedBackDetails.reviewedByDesignation': { $arrayElemAt: ['$employerDetails.designation', 0] },
+                    'feedBackDetails.reviewedByImg': { $arrayElemAt: ['$employerDetails.basicInfo.profileImg', 0] }
                 }
             },
             {
-                $set: {
-                    'feedBackDetails.reviewedByName': '$employerDetails.fullName',
-                    'feedBackDetails.reviewedByDesignation': '$employerDetails.designation',
-                    'feedBackDetails.reviewedByImg': '$employerDetails.basicInfo.profileImg'
+                $group: {
+                    _id: '$_id',
+                    trainerId: { $first: '$trainerId' },
+                    feedBackDetails: { $push: '$feedBackDetails' },
+                    averageRating: { $avg: '$feedBackDetails.rating' },
                 }
             },
+            // {
+            //     "$project": {
+            //         '_id': 1,
+            //         'rating': 1,
+            //         'feedBack': 1,
+            //         'feedBackDetails': 1,
+            //         "reviewedByName": 1,
+            //         "reviewedByDesignation": 1,
+            //         "reviewedByImg": 1,
+            //         // 'trainingDetails': 1,
+            //     }
+            // },
             {
-                "$project": {
-                    '_id': 1,
-                    'rating': 1,
-                    'feedBack': 1,
-                    'feedBackDetails': 1,
-                    "reviewedByName": 1,
-                    "reviewedByDesignation": 1,
-                    "reviewedByImg": 1,
-                    // 'trainingDetails': 1,
+                $project: {
+                    _id: 1,
+                    trainerId: 1,
+                    feedBackDetails: 1,
+                    averageRating: 1
                 }
-            },
+
+            }
         ])
         resp.status(201).json({ success: true, message: 'feedback', findFeedBack })
 
-        console.log('feedback', findFeedBack)
+        // console.log('feedback', findFeedBack)
     }
     catch (error) {
         console.log(error)
@@ -876,7 +958,7 @@ const getNotifications = async (req, resp) => {
     // console.log('userId',userId)
 
     try {
-        if(userId?.length > 0){
+        if (userId?.length > 0) {
 
             const notifications = await nofitificaitonSchema.aggregate([
                 {
@@ -921,12 +1003,12 @@ const getNotifications = async (req, resp) => {
                     }
                 }
             ]);
-    
+
             resp.status(200).json({ success: true, notifications });
         }
-        else{
+        else {
             console.log('user id not found')
-            resp.status(200).json({success:false,message:'User Not Found'})
+            resp.status(200).json({ success: false, message: 'User Not Found' })
         }
     } catch (error) {
         console.error('Error fetching notifications:', error);
@@ -934,26 +1016,26 @@ const getNotifications = async (req, resp) => {
     }
 };
 
-const updateReadNotification=async(req,resp)=>{
-    const {notificationId}=req.params;
-    const {userId}=req.body
+const updateReadNotification = async (req, resp) => {
+    const { notificationId } = req.params;
+    const { userId } = req.body
     console.log('api hit')
-    console.log('notificaitonid',notificationId)
-    console.log('userId',userId)
-    try{
+    console.log('notificaitonid', notificationId)
+    console.log('userId', userId)
+    try {
 
-        const notification=await nofitificaitonSchema.findOneAndUpdate({
-            userId:userId,
-            'notifications._id':notificationId
+        const notification = await nofitificaitonSchema.findOneAndUpdate({
+            userId: userId,
+            'notifications._id': notificationId
         },
-        {
-            $set:{
-                'notifications.$.unread':false
-            }
-        },{
-            new:true
+            {
+                $set: {
+                    'notifications.$.unread': false
+                }
+            }, {
+            new: true
         })
-        if(notification){
+        if (notification) {
             const notifications = await nofitificaitonSchema.aggregate([
                 {
                     $match: {
@@ -998,52 +1080,52 @@ const updateReadNotification=async(req,resp)=>{
                 }
             ]);
             if (notification && notifications) {
-                resp.status(200).json({ success: true, message: 'Notifications Updated',  notifications})
+                resp.status(200).json({ success: true, message: 'Notifications Updated', notifications })
             }
-            else{
-                resp.status(200).json({success:false,message:'No Notification Found'})
+            else {
+                resp.status(200).json({ success: false, message: 'No Notification Found' })
 
             }
         }
-        else{
-            resp.status(200).json({success:false,message:'No Notification Found'})
+        else {
+            resp.status(200).json({ success: false, message: 'No Notification Found' })
         }
 
 
     }
-    catch(error){
+    catch (error) {
         console.log(error)
-        resp.status(200).json({success:false,message:'Internal Server Error'})
+        resp.status(200).json({ success: false, message: 'Internal Server Error' })
     }
 
 }
 
-const deleteAllNotification=async(req,resp)=>{
-    const {userId}=req.body;
-    try{
-        
-        const notification=await nofitificaitonSchema.findOneAndReplace({
-            userId:userId
-        },
-        {
-            userId:userId,
-            notifications:[]
-        },
-        {
-            new:true
-        }
+const deleteAllNotification = async (req, resp) => {
+    const { userId } = req.body;
+    try {
 
-    )
-        if(notification){
-            resp.status(200).json({success:true,message:'Notification Deleted Successfully',notification})
+        const notification = await nofitificaitonSchema.findOneAndReplace({
+            userId: userId
+        },
+            {
+                userId: userId,
+                notifications: []
+            },
+            {
+                new: true
+            }
+
+        )
+        if (notification) {
+            resp.status(200).json({ success: true, message: 'Notification Deleted Successfully', notification })
         }
-        else{
-            resp.status(200).json({success:false,message:'Notification Not Found'})
+        else {
+            resp.status(200).json({ success: false, message: 'Notification Not Found' })
         }
 
     }
-    catch(error){
-        resp.status(200).json({success:false,message:'Internal Server Error'})
+    catch (error) {
+        resp.status(200).json({ success: false, message: 'Internal Server Error' })
 
     }
 
@@ -1069,6 +1151,6 @@ module.exports = {
     addBookMarkedPost, getBookMarkedPostsByUserId, trainerProfileImageUpdate,
     trainerAppliedTraining, getAppliedTraining, deleteAppliedTraining, addTrainingResources,
     testProfileApi,
-    getAllTrainerDetails, UpdatePhoneNumber, trainerSearchHistory, getFeedBack, getNotifications,updateReadNotification,
+    getAllTrainerDetails, UpdatePhoneNumber, trainerSearchHistory, getFeedBack, getNotifications, updateReadNotification,
     deleteAllNotification
 }
