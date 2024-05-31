@@ -53,7 +53,7 @@ route.put('/updateRequestStatus',jwtverify,updateRequestStatus)
 
 route.get("/getEmployerProfileById/:id", getEmployerProfileById);
 route.get('/searchData',trainerSearchHistory)
-
+ 
 route.get('/feedback/:trainerId',getFeedBack)
 route.get('/notifications/:userId',getNotifications)
 route.put('/updateReadNotification/:notificationId',updateReadNotification)
