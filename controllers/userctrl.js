@@ -30,7 +30,7 @@ const generateopt = async (req, resp) => {
             const otp = generateOtp()
             user.Otp = otp
             await user.save();
-            // await sendOTP(number,otp) //otp service
+            await sendOTP(number,otp) //otp service
 
             console.log(otp) 
             localStorage.setItem('phoneNumber', JSON.stringify(number))

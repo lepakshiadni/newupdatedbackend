@@ -14,6 +14,8 @@ RUN npm install
 
 COPY . .
 
+
+
 # Make port 8080 available to the world outside this container
 EXPOSE 4000
 
